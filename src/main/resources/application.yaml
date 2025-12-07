@@ -12,9 +12,9 @@ springdoc:
     path: /swagger-ui.html
 
 logging:
-  level:
-    org.springdoc: DEBUG
-    com.date.datingapp: DEBUG
+  queue:
+    capacity: 100
+
 
 
 
