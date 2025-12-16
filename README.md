@@ -7,9 +7,8 @@
 
 ### Стек технологий
 1. Spring Boot
-2. MapStruct
-3. Lombok
-4. Swagger
+2. Lombok
+3. Swagger
 
 ### Спецификация
 JSON:API

@@ -15,4 +15,9 @@ public record PhotoId(UUID value) {
     public static PhotoId generate() {
         return new PhotoId(UUID.randomUUID());
     }
+
+    @Override
+    public String toString() {
+        return this.value.toString();
+    }
 }

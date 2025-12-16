@@ -1,6 +1,9 @@
 spring:
   application:
     name: datingapp
+  data:
+    mongodb:
+      uri: mongodb://admin:password@localhost:27017/datingdb?authSource=admin
 
 server:
   port: 8080

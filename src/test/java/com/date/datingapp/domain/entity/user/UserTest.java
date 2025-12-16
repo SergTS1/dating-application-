@@ -14,14 +14,14 @@ class UserTest {
     @Test
     void shouldRegisterUserWithProfile() {
         Profile profile = new Profile(new UserName( "Alice"), Gender.FEMALE, new Interests("art"));
-        User user = User.register("alice@mail.com", "hash123", profile);
+        User user = User.register(new Email ("alice@mail.com"), new PasswordHash( "hash123"), profile);
         assertEquals("alice@mail.com", user.getEmail().value());
         assertFalse(user.isVerified());
     }
 
     @Test
     void shouldVerifyUserAfterPhotoApproval() {
-        User user = User.register("bob@mail.com", "hash", new Profile(new UserName("Bob"), Gender.MALE, new Interests("travel")));
+        User user = User.register(new Email ("bob@mail.com"),new PasswordHash( "hash"), new Profile(new UserName("Bob"), Gender.MALE, new Interests("travel")));
         user.uploadPhoto("https://photos.com/1");
         PhotoId photoId = user.getPhotos().get(0).getId();
         user.verifyPhoto(photoId);
@@ -30,13 +30,13 @@ class UserTest {
 
     @Test
     void shouldNotActivatePremiumBeforeVerification() {
-        User user = User.register("eve@mail.com", "hash", new Profile(new UserName("Eve"), Gender.FEMALE, new Interests("design")));
+        User user = User.register(new Email ("eve@mail.com"), new PasswordHash("hash"), new Profile(new UserName("Eve"), Gender.FEMALE, new Interests("design")));
         assertThrows(CodedException.class, user::activatePremium);
     }
 
     @Test
     void shouldActivatePremiumAfterVerification() {
-        User user = User.register("john@mail.com", "hash", new Profile(new UserName("John"), Gender.MALE, new Interests("tech")));
+        User user = User.register(new Email ("john@mail.com"), new PasswordHash("hash"), new Profile(new UserName("John"), Gender.MALE, new Interests("tech")));
         user.uploadPhoto("https://photo.com/1");
         PhotoId photoId = user.getPhotos().get(0).getId();
         user.verifyPhoto(photoId);
@@ -46,7 +46,7 @@ class UserTest {
 
     @Test
     void shouldUploadPhoto() {
-        var user = User.register("bob@mail.com", "hash", new Profile(new UserName("Bob"), Gender.MALE, new Interests("sports")));
+        var user = User.register(new Email ("bob@mail.com"), new PasswordHash("hash"), new Profile(new UserName("Bob"), Gender.MALE, new Interests("sports")));
         user.uploadPhoto("https://example.com/bob.jpg");
         assertEquals(1, user.getPhotos().size());
     }

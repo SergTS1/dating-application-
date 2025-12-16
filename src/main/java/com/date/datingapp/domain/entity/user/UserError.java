@@ -18,6 +18,7 @@ public class UserError {
     public static final String TOO_LONG_NAME = "0199d2a5-012";
     public static final String INTERESTS_CANNOT_BE_EMPTY = "0199d2a5-013";
     public static final String INTERESTS_TOO_LAGE_TEXT = "0199d2a5-014";
+    public static final String GENDER_INVALID = "0199d2a5-015";
 
     private UserError() {
     }
@@ -90,5 +91,10 @@ public class UserError {
     public static CodedException errorInterestsTooLageText() {
         var msg = "Interests text too large";
         return new CodedException(INTERESTS_TOO_LAGE_TEXT, msg);
+    }
+
+    public static CodedException errorInvalidGender() {
+        var msg = "invalid gender";
+        return new CodedException(GENDER_INVALID, msg);
     }
 }
