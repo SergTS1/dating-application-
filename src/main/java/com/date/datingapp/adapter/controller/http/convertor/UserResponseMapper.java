@@ -3,40 +3,74 @@ package com.date.datingapp.adapter.controller.http.convertor;
 
 import com.date.datingapp.adapter.controller.http.response.CreateUserResponse;
 import com.date.datingapp.adapter.controller.http.response.GetUserResponse;
-import com.date.datingapp.boundary.model.UserInfo;
-import org.mapstruct.Mapper;
+import com.date.datingapp.domain.entity.user.User;
+import com.date.datingapp.domain.entity.user.photo.Photo;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface UserResponseMapper {
+import java.util.UUID;
 
-    default GetUserResponse toDto(UserInfo result) {
-        if (result == null) {
+@Component
+public class UserResponseMapper {
+
+    public GetUserResponse toDto(User user) {
+        if (user == null) {
             return null;
         }
-        GetUserResponse.Attributes attributes = toGetUserResponse(result);
+
+        GetUserResponse.Attributes attributes = toGetUserResponse(user);
 
         GetUserResponse.UserData userData = new GetUserResponse.UserData();
-        userData.setId(result.getId());
-        userData.setCreatedAt(result.getCreatedAt());
+        userData.setUuid(user.getId().value());
         userData.setAttributes(attributes);
 
         GetUserResponse response = new GetUserResponse();
         response.setData(userData);
-
         return response;
     }
 
-    GetUserResponse.Attributes toGetUserResponse(UserInfo result);
-
-    default CreateUserResponse toCreateDto(UserInfo result) {
-        if (result == null) {
+    public GetUserResponse.Attributes toGetUserResponse(User user) {
+        if (user == null) {
             return null;
         }
-        CreateUserResponse.UserData userData = toCreateUserResponse(result);
+
+        GetUserResponse.Attributes attributes = new GetUserResponse.Attributes();
+        attributes.setUuid(user.getId().value());
+        attributes.setEmail(user.getEmail().value());
+        attributes.setName(user.getProfile().name().value());
+        attributes.setGender(user.getProfile().gender().name());
+        attributes.setInterests(user.getProfile().interests().value());
+        attributes.setVerificationStatus(user.getVerificationStatus().name());
+        attributes.setUserPremiumStatus(user.getPremiumStatus().name());
+
+        String photo = String.valueOf(user.getPhotos().stream()
+                .findFirst()
+                .map(Photo::getUrl)
+                .orElse(null));
+        attributes.setPhoto(photo);
+
+        return attributes;
+    }
+
+    public CreateUserResponse toCreateDto(UUID userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        CreateUserResponse.UserData userData = toCreateUserResponse(userId);
         CreateUserResponse response = new CreateUserResponse();
         response.setData(userData);
         return response;
     }
 
-    CreateUserResponse.UserData toCreateUserResponse(UserInfo result);
+    public CreateUserResponse.UserData toCreateUserResponse(UUID userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        CreateUserResponse.UserData userData = new CreateUserResponse.UserData();
+        userData.setUuid(userId);
+        return userData;
+    }
+
+
 }

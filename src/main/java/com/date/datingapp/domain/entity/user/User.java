@@ -2,6 +2,7 @@ package com.date.datingapp.domain.entity.user;
 
 import com.date.datingapp.domain.entity.user.enums.UserPremiumStatus;
 import com.date.datingapp.domain.entity.user.enums.UserVerificationStatus;
+import com.date.datingapp.domain.entity.user.enums.VerifiedStatus;
 import com.date.datingapp.domain.entity.user.photo.Photo;
 import com.date.datingapp.domain.entity.user.photo.PhotoId;
 
@@ -19,7 +20,6 @@ public class User {
     private UserVerificationStatus verificationStatus;
     private UserPremiumStatus premiumStatus;
 
-
     private User(UserId id, Email email, PasswordHash password, Profile profile) {
         this.id = id;
         this.email = email;
@@ -30,8 +30,24 @@ public class User {
         this.premiumStatus = UserPremiumStatus.FREE;
     }
 
-    public static User register(String email, String password, Profile profile) {
-        return new User(UserId.generate(), new Email(email), new PasswordHash(password), profile);
+    public static User restore(
+            UserId id,
+            Email email,
+            PasswordHash password,
+            Profile profile,
+            List<Photo> photos,
+            UserVerificationStatus verificationStatus,
+            UserPremiumStatus premiumStatus
+    ) {
+        User user = new User(id, email, password, profile);
+        user.photos.addAll(photos);
+        user.verificationStatus = verificationStatus;
+        user.premiumStatus = premiumStatus;
+        return user;
+    }
+
+    public static User register(Email email, PasswordHash password, Profile profile) {
+        return new User(UserId.generate(), email, password, profile);
     }
 
     public void uploadPhoto(String url) {
@@ -43,7 +59,7 @@ public class User {
                 .filter(p -> p.getId().equals(photoId))
                 .findFirst()
                 .ifPresent(Photo::markVerified);
-        if (photos.stream().anyMatch(Photo::isVerified)) {
+        if (photos.stream().anyMatch(p -> p.getStatus() == VerifiedStatus.ACTIVE)) {
             this.verificationStatus = UserVerificationStatus.VERIFIED;
         }
     }
@@ -83,4 +99,11 @@ public class User {
         return email;
     }
 
+    public PasswordHash getPassword() {
+        return password;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Schema(description = "Response after creating a new user")
@@ -22,12 +23,9 @@ public class CreateUserResponse {
     @Schema(description = "User data wrapper")
     public static class UserData {
 
-        @Schema(description = "User attributes")
-        @JsonProperty("createdAt")
-        LocalDateTime createdAt;
 
-        @Schema(description = "User ID", example = "1")
-        @JsonProperty("id")
-        Long id;
+        @Schema(description = "User UUID")
+        @JsonProperty("uuid")
+        UUID uuid;
     }
 }

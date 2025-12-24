@@ -6,8 +6,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Schema(description = "Request to create a new user")
@@ -40,13 +38,17 @@ public class CreateUserRequest {
         @JsonProperty("email")
         String email;
 
-        @Schema(description = "user phone number")
-        @JsonProperty("phone_number")
-        Long phoneNumber;
+        @Schema(description = "User's password", example = "lkrgni3k")
+        @JsonProperty("password")
+        String password;
 
-        @Schema(description = "User's creation timestamp", example = "2023-10-05T14:48:00")
-        @JsonProperty("created_at")
-        LocalDateTime createdAt;
+        @Schema(description = "User's gender", example = "Male")
+        @JsonProperty("gender")
+        String gender;
+
+        @Schema(description = "User's interests", example = "soccer")
+        @JsonProperty("interests")
+        String interests;
     }
 
 }

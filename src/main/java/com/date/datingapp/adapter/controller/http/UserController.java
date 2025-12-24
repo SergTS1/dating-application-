@@ -7,16 +7,19 @@ import com.date.datingapp.adapter.controller.http.request.CreateUserRequest;
 import com.date.datingapp.adapter.controller.http.response.CreateUserResponse;
 import com.date.datingapp.adapter.controller.http.response.GetUserResponse;
 import com.date.datingapp.boundary.model.CreateUserParam;
-import com.date.datingapp.boundary.model.UserInfo;
-import com.date.datingapp.boundary.usecase.CreateUserUseCase;
-import com.date.datingapp.boundary.usecase.GetUserUseCase;
+import com.date.datingapp.boundary.usecase.UserUseCase;
+import com.date.datingapp.domain.entity.user.User;
+import com.date.datingapp.domain.entity.user.UserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RestController
@@ -25,8 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User", description = "APIs for users")
 public class UserController {
 
-    CreateUserUseCase createUserUseCase;
-    GetUserUseCase getUserUseCase;
+    UserUseCase userUseCase;
     UserRequestMapper requestMapper;
     UserResponseMapper responseMapper;
 
@@ -34,18 +36,25 @@ public class UserController {
     @PostMapping
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest request) {
         CreateUserParam params = requestMapper.toParam(request);
-        UserInfo userInfo = createUserUseCase.create(params);
-        CreateUserResponse getUserResponse = responseMapper.toCreateDto(userInfo);
+        UserId userId = userUseCase.create(params);
+        CreateUserResponse getUserResponse = responseMapper.toCreateDto(userId.value());
         return ResponseEntity.ok(getUserResponse);
     }
 
-    @Operation(summary = "Get user by ID", description = "Retrieves user information by user ID.")
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<GetUserResponse> getUserById(@PathVariable Long id) {
-        UserInfo userInfo = getUserUseCase.getUserById(id);
-        GetUserResponse getUserResponse = responseMapper.toDto(userInfo);
+    @Operation(summary = "Get user by UUID", description = "Retrieves user information by user UUID.")
+    @GetMapping(path = "/{uuid}")
+    public ResponseEntity<GetUserResponse> getUserByUUID(@PathVariable UUID uuid) {
+        User user = userUseCase.getUserByUUID(uuid);
+        GetUserResponse getUserResponse = responseMapper.toDto(user);
         return ResponseEntity.ok(getUserResponse);
 
+    }
+
+    @Operation(summary = "Delete user by id", description = "Deletes an existing user by id.")
+    @DeleteMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserByUUID(@PathVariable UUID uuid) {
+        userUseCase.deleteUserByUUID(uuid);
     }
 
 }
