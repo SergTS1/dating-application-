@@ -18,6 +18,7 @@ public class UserUseCaseImpl implements UserUseCase {
     private final UserRepository userRepository;
     private final Logger logger;
     private final UserUseCaseError userUseCaseError;
+    private static final String SUCCESSFULLY_REGISTERED = "User successfully registered. userId={}";
 
     public UserUseCaseImpl(
             UserRepository userRepository,
@@ -54,7 +55,7 @@ public class UserUseCaseImpl implements UserUseCase {
         );
 
         userRepository.save(user);
-        logger.info("User successfully registered. userId={}", user.getId().value());
+        logger.info(SUCCESSFULLY_REGISTERED, user.getId().value());
         return user.getId();
     }
 
