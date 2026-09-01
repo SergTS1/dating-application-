@@ -3,6 +3,9 @@ package com.date.datingapp.adapter.controller.http.convertor;
 
 import com.date.datingapp.adapter.controller.http.response.CreateUserResponse;
 import com.date.datingapp.adapter.controller.http.response.GetUserResponse;
+import com.date.datingapp.boundary.model.PhotoCard;
+import com.date.datingapp.boundary.model.UserCard;
+import com.date.datingapp.domain.entity.user.Profile;
 import com.date.datingapp.domain.entity.user.User;
 import com.date.datingapp.domain.entity.user.photo.Photo;
 import org.springframework.stereotype.Component;
@@ -72,5 +75,22 @@ public class UserResponseMapper {
         return userData;
     }
 
+    public UserCard toUserCard(User user) {
+        if (user == null) {
+            return null;
+        }
 
+        Profile profile = user.getProfile();
+        Photo photo = user.getPhotos().stream().findFirst().orElse(null);
+
+        PhotoCard photoCard = photo ==null ? null : new PhotoCard(photo.getId().value(), photo.getUrl().value());
+
+        return new UserCard(
+                user.getId().value(),
+                profile.name().value(),
+                profile.gender(),
+                profile.interests().value(),
+                photoCard
+        );
+    }
 }

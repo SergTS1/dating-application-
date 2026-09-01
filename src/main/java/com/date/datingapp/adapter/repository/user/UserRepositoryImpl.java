@@ -5,11 +5,15 @@ import com.date.datingapp.adapter.repository.user.model.UserDbModel;
 import com.date.datingapp.boundary.repository.UserRepository;
 import com.date.datingapp.domain.entity.user.Email;
 import com.date.datingapp.domain.entity.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,5 +71,21 @@ public class UserRepositoryImpl implements UserRepository {
         );
 
         mongoTemplate.remove(query, UserDbModel.class);
+    }
+
+    @Override
+    public Page<User> getUsersForCards(Pageable pageable) {
+        Query query = Query.query(Criteria.where("photos.status").is("ACTIVE"));
+
+        long total = mongoTemplate.count(query, UserDbModel.class);
+
+        query.with(pageable);
+
+        List<User> users = mongoTemplate.find(query, UserDbModel.class)
+                .stream()
+                .map(UserConverter::toEntity)
+                .toList();
+
+        return new PageImpl<>(users, pageable, total);
     }
 }

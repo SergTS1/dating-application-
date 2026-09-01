@@ -6,6 +6,10 @@ import com.date.datingapp.boundary.usecase.UserUseCase;
 import com.date.datingapp.domain.entity.user.*;
 import com.date.datingapp.domain.entity.user.enums.Gender;
 import com.date.datingapp.infra.logger.Logger;
+import com.date.datingapp.infra.util.PageParam;
+import com.date.datingapp.infra.util.PaginationUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -73,6 +77,13 @@ public class UserUseCaseImpl implements UserUseCase {
     @Override
     public void deleteUserByUUID(UUID userId) {
         userRepository.deleteUserByUUID(userId);
+    }
+
+    @Override
+    public Page<User> getUserCards(PageParam pageParam) {
+        Pageable pageable = PaginationUtil.getPageable(pageParam);
+
+        return userRepository.getUsersForCards(pageable);
     }
 
 }
