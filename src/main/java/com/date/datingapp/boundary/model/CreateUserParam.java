@@ -1,14 +1,16 @@
 package com.date.datingapp.boundary.model;
 
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @Data
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CreateUserParam {
 
-    private String name;
-    private String gender;
-    private String interests;
-    private String email;
-    private String password;
+    String name;
+    String gender;
+    String interests;
+    String email;
+    String password;
 
 }

@@ -6,15 +6,19 @@ import com.date.datingapp.adapter.controller.http.convertor.UserResponseMapper;
 import com.date.datingapp.adapter.controller.http.request.CreateUserRequest;
 import com.date.datingapp.adapter.controller.http.response.CreateUserResponse;
 import com.date.datingapp.adapter.controller.http.response.GetUserResponse;
+import com.date.datingapp.boundary.model.UserCard;
 import com.date.datingapp.boundary.model.CreateUserParam;
 import com.date.datingapp.boundary.usecase.UserUseCase;
 import com.date.datingapp.domain.entity.user.User;
 import com.date.datingapp.domain.entity.user.UserId;
+import com.date.datingapp.infra.util.PageParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +59,14 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserByUUID(@PathVariable UUID uuid) {
         userUseCase.deleteUserByUUID(uuid);
+    }
+
+    @Operation(summary = "Get user cards", description = "Retrieves a paginated list of user cards for swiping.")
+    @GetMapping("/cards")
+    public ResponseEntity<Page<UserCard>> getUserCards(@ParameterObject PageParam pageParam) {
+        Page<User> response = userUseCase.getUserCards(pageParam);
+        Page<UserCard> userCardPage = response.map(responseMapper::toUserCard);
+        return ResponseEntity.ok(userCardPage);
     }
 
 }
