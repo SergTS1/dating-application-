@@ -1,5 +1,6 @@
 package com.date.datingapp.domain.usecase.user;
 
+import com.date.datingapp.adapter.storage.MinioStorage;
 import com.date.datingapp.boundary.model.CreateUserParam;
 import com.date.datingapp.boundary.repository.UserRepository;
 import com.date.datingapp.boundary.usecase.UserUseCase;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class UserUseCaseImpl implements UserUseCase {
 
     private final UserRepository userRepository;
+    private final MinioStorage minioStorage;
     private final Logger logger;
     private final UserUseCaseError userUseCaseError;
     private static final String SUCCESSFULLY_REGISTERED = "User successfully registered. userId={}";
@@ -27,10 +29,12 @@ public class UserUseCaseImpl implements UserUseCase {
     public UserUseCaseImpl(
             UserRepository userRepository,
             Logger logger,
-            UserUseCaseError userUseCaseError) {
+            UserUseCaseError userUseCaseError,
+            MinioStorage minioStorage) {
         this.userRepository = userRepository;
         this.logger = logger;
         this.userUseCaseError = userUseCaseError;
+        this.minioStorage = minioStorage;
     }
 
     @Override
@@ -84,6 +88,15 @@ public class UserUseCaseImpl implements UserUseCase {
         Pageable pageable = PaginationUtil.getPageable(pageParam);
 
         return userRepository.getUsersForCards(pageable);
+    }
+
+    @Override
+    public void uploadPhoto(UUID uuid, String fileName, String contentType, byte[] content) {
+        User user = userRepository.getUserByUUID(uuid).orElseThrow(() -> userUseCaseError.userNotFound(uuid));
+
+        String url = minioStorage.upload(uuid, fileName, contentType, content);
+        user.uploadPhoto(url);
+        userRepository.save(user);
     }
 
 }

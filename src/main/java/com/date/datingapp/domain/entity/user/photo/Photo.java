@@ -3,7 +3,6 @@ package com.date.datingapp.domain.entity.user.photo;
 import com.date.datingapp.domain.entity.user.enums.VerifiedStatus;
 
 import static com.date.datingapp.domain.entity.user.enums.VerifiedStatus.ACTIVE;
-import static com.date.datingapp.domain.entity.user.enums.VerifiedStatus.INACTIVE;
 
 
 public class Photo {
@@ -22,7 +21,8 @@ public class Photo {
         return new Photo(
                 PhotoId.generate(),
                 new PhotoUrl(url),
-                INACTIVE);
+                //TODO: set status to INACTIVE later, it will be new logic
+                ACTIVE);
     }
 
     public static Photo restore(
