@@ -36,12 +36,12 @@ public final class UserUseCaseError {
     }
 
     public CodedException paramsAreRequired() {
-        var msg = "Params are required";
-        return new CodedException(REQUIRED_PARAMS, msg);
+        var message = "Params are required";
+        return new CodedException(REQUIRED_PARAMS, message);
     }
 
     public CodedException userAlreadyExists() {
-        var msg = "User already exists";
-        return new CodedException(USER_ALREADY_EXISTS, msg);
+        var message = "User already exists";
+        return new CodedException(USER_ALREADY_EXISTS, message);
     }
 }

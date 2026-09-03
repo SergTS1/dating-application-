@@ -20,9 +20,12 @@ import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -67,6 +70,14 @@ public class UserController {
         Page<User> response = userUseCase.getUserCards(pageParam);
         Page<UserCard> userCardPage = response.map(responseMapper::toUserCard);
         return ResponseEntity.ok(userCardPage);
+    }
+
+    @Operation(summary = "Post user photo", description = "Add user`s picture")
+    @PostMapping(value = "/{uuid}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> uploadPhoto(@PathVariable UUID uuid,
+                                            @RequestParam("file")MultipartFile file) throws IOException {
+        userUseCase.uploadPhoto(uuid, file.getOriginalFilename(), file.getContentType(), file.getBytes());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }

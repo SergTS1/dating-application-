@@ -18,4 +18,6 @@ public interface UserUseCase {
     void deleteUserByUUID(UUID userId);
 
     Page<User> getUserCards(PageParam pageParam);
+
+    void uploadPhoto(UUID uuid, String fileName, String contentType, byte[] content);
 }
