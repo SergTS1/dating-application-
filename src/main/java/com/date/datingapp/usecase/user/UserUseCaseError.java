@@ -1,4 +1,4 @@
-package com.date.datingapp.domain.usecase.user;
+package com.date.datingapp.usecase.user;
 
 import com.date.datingapp.domain.entity.user.photo.PhotoId;
 import com.date.datingapp.infra.logger.Logger;
