@@ -16,7 +16,7 @@ public final class PhotoConverter {
     public static PhotoDbModel toDbModel(Photo photo) {
         var photoDbModel = new PhotoDbModel();
         photoDbModel.setId(photo.getId().toString());
-        photoDbModel.setUrl(photo.getUrl().toString());
+        photoDbModel.setUrl(photo.getUrl().value());
         photoDbModel.setStatus(photo.getStatus().name());
         return photoDbModel;
     }

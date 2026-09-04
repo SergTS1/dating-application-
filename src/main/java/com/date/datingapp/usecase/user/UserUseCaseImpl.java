@@ -1,4 +1,4 @@
-package com.date.datingapp.domain.usecase.user;
+package com.date.datingapp.usecase.user;
 
 import com.date.datingapp.adapter.storage.MinioStorage;
 import com.date.datingapp.boundary.model.CreateUserParam;
