@@ -1,6 +1,5 @@
 package com.date.datingapp.infra.mongodb;
 
-
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -8,6 +7,7 @@ import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
@@ -43,21 +43,24 @@ public class MongoDBConfig {
     }
 
     @Bean
-    MongoTemplate mongoTemplate(
-            MongoClient mongoClient,
-            MongoMappingContext mongoMappingContext,
-            ConnectionString connectionString) {
-        var mongoDbFactory = new SimpleMongoClientDatabaseFactory(
+    MongoDatabaseFactory mongoDatabaseFactory(MongoClient mongoClient, ConnectionString connectionString) {
+        return new SimpleMongoClientDatabaseFactory(
                 mongoClient,
                 Objects.requireNonNull(connectionString.getDatabase()));
+    }
+
+    @Bean
+    MongoTemplate mongoTemplate(
+            MongoDatabaseFactory mongoDatabaseFactory,
+            MongoMappingContext mongoMappingContext) {
 
         var converter = new MappingMongoConverter(
-                new DefaultDbRefResolver(mongoDbFactory),
+                new DefaultDbRefResolver(mongoDatabaseFactory),
                 mongoMappingContext);
 
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         converter.afterPropertiesSet();
 
-        return new MongoTemplate(mongoDbFactory, converter);
+        return new MongoTemplate(mongoDatabaseFactory, converter);
     }
 }
