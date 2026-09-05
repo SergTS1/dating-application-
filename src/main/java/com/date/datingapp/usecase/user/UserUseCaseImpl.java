@@ -2,6 +2,9 @@ package com.date.datingapp.usecase.user;
 
 import com.date.datingapp.adapter.storage.MinioStorage;
 import com.date.datingapp.boundary.model.CreateUserParam;
+import com.date.datingapp.boundary.model.event.OutboxEvent;
+import com.date.datingapp.boundary.model.event.UserCreatedEvent;
+import com.date.datingapp.boundary.repository.OutboxRepository;
 import com.date.datingapp.boundary.repository.UserRepository;
 import com.date.datingapp.boundary.usecase.UserUseCase;
 import com.date.datingapp.domain.entity.user.*;
@@ -9,10 +12,14 @@ import com.date.datingapp.domain.entity.user.enums.Gender;
 import com.date.datingapp.infra.logger.Logger;
 import com.date.datingapp.infra.util.PageParam;
 import com.date.datingapp.infra.util.PaginationUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,23 +28,31 @@ import java.util.UUID;
 public class UserUseCaseImpl implements UserUseCase {
 
     private final UserRepository userRepository;
+    private final OutboxRepository outboxRepository;
     private final MinioStorage minioStorage;
     private final Logger logger;
     private final UserUseCaseError userUseCaseError;
+    private final ObjectMapper objectMapper;
     private static final String SUCCESSFULLY_REGISTERED = "User successfully registered. userId={}";
+    private static final String USER_CREATED_EVENT = "USER_CREATED";
 
     public UserUseCaseImpl(
             UserRepository userRepository,
+            OutboxRepository outboxRepository,
             Logger logger,
             UserUseCaseError userUseCaseError,
-            MinioStorage minioStorage) {
+            MinioStorage minioStorage,
+            ObjectMapper objectMapper) {
         this.userRepository = userRepository;
+        this.outboxRepository = outboxRepository;
         this.logger = logger;
         this.userUseCaseError = userUseCaseError;
         this.minioStorage = minioStorage;
+        this.objectMapper = objectMapper;
     }
 
     @Override
+    @Transactional
     public UserId create(CreateUserParam params) {
         if (params == null) {
             throw userUseCaseError.paramsAreRequired();
@@ -63,8 +78,31 @@ public class UserUseCaseImpl implements UserUseCase {
         );
 
         userRepository.save(user);
+        createUserOutboxEvent(user);
+
         logger.info(SUCCESSFULLY_REGISTERED, user.getId().value());
         return user.getId();
+    }
+
+    private void createUserOutboxEvent(User user) {
+        UserCreatedEvent event = new UserCreatedEvent(user.getId().value().toString());
+        String payload;
+
+        try {
+            payload = objectMapper.writeValueAsString(event);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Failed to serialize UserCreatedEvent", e);
+        }
+
+        OutboxEvent outboxEvent = new OutboxEvent(
+                UUID.randomUUID().toString(),
+                user.getId().value().toString(),
+                USER_CREATED_EVENT,
+                payload,
+                Instant.now()
+        );
+
+        outboxRepository.save(outboxEvent);
     }
 
     @Override
