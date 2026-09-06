@@ -1,4 +1,4 @@
-package com.date.datingapp.infra.config.minio;
+package com.date.datingapp.infra.minio;
 
 
 import com.date.datingapp.shared.exception.CodedException;

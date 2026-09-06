@@ -1,7 +1,7 @@
 package com.date.datingapp.adapter.storage;
 
-import com.date.datingapp.infra.config.minio.MinioProperties;
-import com.date.datingapp.infra.config.minio.MinioStorageError;
+import com.date.datingapp.infra.minio.MinioProperties;
+import com.date.datingapp.infra.minio.MinioStorageError;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
