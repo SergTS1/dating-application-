@@ -3,6 +3,7 @@ package com.date.datingapp.usecase.user;
 import com.date.datingapp.adapter.storage.MinioStorage;
 import com.date.datingapp.boundary.model.CreateUserParam;
 import com.date.datingapp.boundary.model.event.OutboxEvent;
+import com.date.datingapp.boundary.model.event.OutboxEventStatus;
 import com.date.datingapp.boundary.model.event.UserCreatedEvent;
 import com.date.datingapp.boundary.repository.OutboxRepository;
 import com.date.datingapp.boundary.repository.UserRepository;
@@ -23,6 +24,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.date.datingapp.boundary.model.event.OutboxEventType.USER_CREATED;
+
 
 @Service
 public class UserUseCaseImpl implements UserUseCase {
@@ -34,7 +37,6 @@ public class UserUseCaseImpl implements UserUseCase {
     private final UserUseCaseError userUseCaseError;
     private final ObjectMapper objectMapper;
     private static final String SUCCESSFULLY_REGISTERED = "User successfully registered. userId={}";
-    private static final String USER_CREATED_EVENT = "USER_CREATED";
 
     public UserUseCaseImpl(
             UserRepository userRepository,
@@ -97,8 +99,9 @@ public class UserUseCaseImpl implements UserUseCase {
         OutboxEvent outboxEvent = new OutboxEvent(
                 UUID.randomUUID().toString(),
                 user.getId().value().toString(),
-                USER_CREATED_EVENT,
+                USER_CREATED,
                 payload,
+                OutboxEventStatus.PENDING,
                 Instant.now()
         );
 

@@ -14,6 +14,7 @@ public class OutboxConverter {
         model.setAggregateId(event.aggregateId());
         model.setEventType(event.eventType());
         model.setPayload(event.payload());
+        model.setStatus(event.status());
         model.setCreatedAt(event.createdAt());
 
         return model;
@@ -26,6 +27,7 @@ public class OutboxConverter {
                 model.getAggregateId(),
                 model.getEventType(),
                 model.getPayload(),
+                model.getStatus(),
                 model.getCreatedAt()
         );
     }

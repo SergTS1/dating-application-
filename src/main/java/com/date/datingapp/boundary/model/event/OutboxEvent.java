@@ -5,8 +5,9 @@ import java.time.Instant;
 
 public record OutboxEvent(String id,
                           String aggregateId,
-                          String eventType,
+                          OutboxEventType eventType,
                           String payload,
+                          OutboxEventStatus status,
                           Instant createdAt
 ) {
 }
