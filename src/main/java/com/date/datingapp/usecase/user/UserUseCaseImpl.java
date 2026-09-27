@@ -5,6 +5,7 @@ import com.date.datingapp.boundary.model.CreateUserParam;
 import com.date.datingapp.boundary.model.event.OutboxEvent;
 import com.date.datingapp.boundary.model.event.OutboxEventStatus;
 import com.date.datingapp.boundary.model.event.UserCreatedEvent;
+import com.date.datingapp.boundary.model.event.UserDeletedEvent;
 import com.date.datingapp.boundary.repository.OutboxRepository;
 import com.date.datingapp.boundary.repository.UserRepository;
 import com.date.datingapp.boundary.usecase.UserUseCase;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.date.datingapp.boundary.model.event.OutboxEventType.USER_CREATED;
+import static com.date.datingapp.boundary.model.event.OutboxEventType.USER_DELETED;
 
 
 @Service
@@ -37,6 +39,7 @@ public class UserUseCaseImpl implements UserUseCase {
     private final UserUseCaseError userUseCaseError;
     private final ObjectMapper objectMapper;
     private static final String SUCCESSFULLY_REGISTERED = "User successfully registered. userId={}";
+    private static final String SUCCESSFULLY_DELETED = "User successfully deleted. userId={}";
 
     public UserUseCaseImpl(
             UserRepository userRepository,
@@ -108,6 +111,27 @@ public class UserUseCaseImpl implements UserUseCase {
         outboxRepository.save(outboxEvent);
     }
 
+    private void deleteUserOutboxEvent(UUID userId) {
+        UserDeletedEvent event = new UserDeletedEvent(userId.toString());
+        String payload;
+
+        try {
+            payload = objectMapper.writeValueAsString(event);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Failed to serialize UserEvent", e);
+        }
+
+        OutboxEvent outboxEvent = new OutboxEvent(
+                UUID.randomUUID().toString(),
+                userId.toString(),
+                USER_DELETED,
+                payload,
+                OutboxEventStatus.PENDING,
+                Instant.now()
+        );
+        outboxRepository.save(outboxEvent);
+    }
+
     @Override
     public User getUserByUUID(UUID userId) {
         Optional<User> result = userRepository.getUserByUUID(userId);
@@ -120,8 +144,11 @@ public class UserUseCaseImpl implements UserUseCase {
     }
 
     @Override
+    @Transactional
     public void deleteUserByUUID(UUID userId) {
         userRepository.deleteUserByUUID(userId);
+        deleteUserOutboxEvent(userId);
+        logger.info(SUCCESSFULLY_DELETED, userId);
     }
 
     @Override
