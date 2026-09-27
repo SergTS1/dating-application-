@@ -11,6 +11,7 @@ public final class OutboxEventTopicResolver {
     public static String resolve(OutboxEventType event) {
         return switch (event) {
             case USER_CREATED -> KafkaTopics.USER_CREATED;
+            case USER_DELETED -> KafkaTopics.USER_DELETED;
         };
     }
 }
