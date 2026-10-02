@@ -69,8 +69,27 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.0
+    container_name: keycloak
+    restart: unless-stopped
+
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
+
+    command:
+      - start-dev
+
+    ports:
+      - "8082:8080"
+
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
 volumes:
   mongodb_data:
   mongodb_config:
   minio_data:
   kafka_data:
+  keycloak_data:
