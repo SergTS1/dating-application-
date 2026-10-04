@@ -14,6 +14,7 @@
 4. MinIO
 5. Kafka
 6. MongoDB
+7. Keycloak
 
 ### Спецификация
 JSON:API
