@@ -58,7 +58,7 @@ public class UserUseCaseImpl implements UserUseCase {
 
     @Override
     @Transactional
-    public UserId create(CreateUserParam params) {
+    public UserId create(UUID userId, CreateUserParam params) {
         if (params == null) {
             throw userUseCaseError.paramsAreRequired();
         }
@@ -76,7 +76,9 @@ public class UserUseCaseImpl implements UserUseCase {
             throw userUseCaseError.userAlreadyExists();
         }
 
+        UserId id = new UserId(userId);
         User user = User.register(
+                id,
                 email,
                 password,
                 profile
