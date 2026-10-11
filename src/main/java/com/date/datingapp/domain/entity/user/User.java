@@ -46,8 +46,8 @@ public class User {
         return user;
     }
 
-    public static User register(Email email, PasswordHash password, Profile profile) {
-        return new User(UserId.generate(), email, password, profile);
+    public static User register(UserId id, Email email, PasswordHash password, Profile profile) {
+        return new User(id, email, password, profile);
     }
 
     public void uploadPhoto(String url) {

@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface UserUseCase {
 
-    UserId create(CreateUserParam params);
+    UserId create(UUID userId, CreateUserParam params);
 
     User getUserByUUID(UUID userId);
 

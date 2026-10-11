@@ -22,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,10 +43,11 @@ public class UserController {
 
     @Operation(summary = "Create a new user", description = "Creates a new user with the provided details.")
     @PostMapping
-    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<CreateUserResponse> createUser(@AuthenticationPrincipal Jwt jwt, @RequestBody CreateUserRequest request) {
         CreateUserParam params = requestMapper.toParam(request);
-        UserId userId = userUseCase.create(params);
-        CreateUserResponse getUserResponse = responseMapper.toCreateDto(userId.value());
+        UUID userId = UUID.fromString(jwt.getSubject());
+        UserId createdUserId = userUseCase.create(userId, params);
+        CreateUserResponse getUserResponse = responseMapper.toCreateDto(createdUserId.value());
         return ResponseEntity.ok(getUserResponse);
     }
 
